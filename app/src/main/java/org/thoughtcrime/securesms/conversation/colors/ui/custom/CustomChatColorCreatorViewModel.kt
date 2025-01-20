@@ -44,18 +44,22 @@ class CustomChatColorCreatorViewModel(
 
         val topHue: Float = topHsl[0]
         val topSaturation: Float = topHsl[1]
+        val topLightness: Float = topHsl[2]
 
         val bottomHue: Float = bottomHsl[0]
         val bottomSaturation: Float = bottomHsl[1]
+        val bottomLightness: Float = bottomHsl[2]
 
         val topEdge = ColorSlidersState(
           huePosition = ((topHue / 360f) * maxSliderValue).roundToInt(),
-          saturationPosition = (topSaturation * maxSliderValue).roundToInt()
+          saturationPosition = (topSaturation * maxSliderValue).roundToInt(),
+          lightnessPosition = (topLightness * maxSliderValue).roundToInt()
         )
 
         val bottomEdge = ColorSlidersState(
           huePosition = ((bottomHue / 360f) * maxSliderValue).roundToInt(),
-          saturationPosition = (bottomSaturation * maxSliderValue).roundToInt()
+          saturationPosition = (bottomSaturation * maxSliderValue).roundToInt(),
+          lightnessPosition = (bottomLightness * maxSliderValue).roundToInt()
         )
 
         store.update { state ->
@@ -96,6 +100,17 @@ class CustomChatColorCreatorViewModel(
     }
   }
 
+  fun setLightnessProgress(progress: Int) {
+    store.update {state ->
+      state.copy(
+        sliderStates = state.sliderStates.apply {
+          val oldData: ColorSlidersState = requireNotNull(get(state.selectedEdge))
+          put(state.selectedEdge, oldData.copy(lightnessPosition = progress))
+        }
+      )
+    }
+  }
+
   fun setDegrees(degrees: Float) {
     store.update { it.copy(degrees = degrees) }
   }
@@ -127,8 +142,8 @@ class CustomChatColorCreatorViewModel(
     wallpaper = null,
     sliderStates = EnumMap(
       mapOf(
-        CustomChatColorEdge.TOP to ColorSlidersState(maxSliderValue / 2, maxSliderValue / 2),
-        CustomChatColorEdge.BOTTOM to ColorSlidersState(maxSliderValue / 2, maxSliderValue / 2)
+        CustomChatColorEdge.TOP to ColorSlidersState(maxSliderValue / 2, maxSliderValue / 2, maxSliderValue / 2),
+        CustomChatColorEdge.BOTTOM to ColorSlidersState(maxSliderValue / 2, maxSliderValue / 2, maxSliderValue / 2)
       )
     ),
     selectedEdge = CustomChatColorEdge.BOTTOM,

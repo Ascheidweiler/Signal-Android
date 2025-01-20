@@ -48,6 +48,7 @@ class CustomChatColorCreatorPageFragment :
 
   private lateinit var hueSlider: AppCompatSeekBar
   private lateinit var saturationSlider: AppCompatSeekBar
+  private lateinit var lightnessSlider: AppCompatSeekBar
   private lateinit var preview: ChatColorPreviewView
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,6 +65,7 @@ class CustomChatColorCreatorPageFragment :
 
     val hueThumb = ThumbDrawable(requireContext())
     val saturationThumb = ThumbDrawable(requireContext())
+    val lightnessThumb = ThumbDrawable(requireContext())
 
     val gradientTool: CustomChatColorGradientToolView = view.findViewById(R.id.gradient_tool)
     val save: View = view.findViewById(R.id.save)
@@ -93,12 +95,15 @@ class CustomChatColorCreatorPageFragment :
 
     hueSlider = view.findViewById(R.id.hue_slider)
     saturationSlider = view.findViewById(R.id.saturation_slider)
+    lightnessSlider = view.findViewById(R.id.lightness_slider)
 
     hueSlider.thumb = hueThumb
     saturationSlider.thumb = saturationThumb
+    lightnessSlider.thumb = lightnessThumb
 
     hueSlider.max = MAX_SEEK_DIVISIONS
     saturationSlider.max = MAX_SEEK_DIVISIONS
+    lightnessSlider.max = MAX_SEEK_DIVISIONS
 
     val colors: IntArray = (0..MAX_SEEK_DIVISIONS).map { hue ->
       ColorUtils.HSLToColor(
@@ -120,6 +125,12 @@ class CustomChatColorCreatorPageFragment :
 
     saturationSlider.progressDrawable = saturationProgressDrawable.forSeekBar()
 
+    val lightnessProgressDrawable = GradientDrawable().apply{
+      orientation = GradientDrawable.Orientation.LEFT_RIGHT
+    }
+
+    lightnessSlider.progressDrawable = lightnessProgressDrawable.forSeekBar()
+
     hueSlider.setOnSeekBarChangeListener(
       OnProgressChangedListener {
         viewModel.setHueProgress(it)
@@ -129,6 +140,12 @@ class CustomChatColorCreatorPageFragment :
     saturationSlider.setOnSeekBarChangeListener(
       OnProgressChangedListener {
         viewModel.setSaturationProgress(it)
+      }
+    )
+
+    lightnessSlider.setOnSeekBarChangeListener(
+      OnProgressChangedListener {
+        viewModel.setLightnessProgress(it)
       }
     )
 
@@ -166,11 +183,14 @@ class CustomChatColorCreatorPageFragment :
 
       hueSlider.progress = sliderState.huePosition
       saturationSlider.progress = sliderState.saturationPosition
+      lightnessSlider.progress = sliderState.lightnessPosition
 
       val color: Int = sliderState.getColor()
       hueThumb.setColor(sliderState.getHueColor())
       saturationThumb.setColor(color)
       saturationProgressDrawable.colors = sliderState.getSaturationColors()
+      lightnessThumb.setColor(sliderState.getLightnessColor())
+      lightnessProgressDrawable.colors = sliderState.getLightnessColors()
 
       preview.setWallpaper(state.wallpaper)
 
@@ -237,20 +257,35 @@ class CustomChatColorCreatorPageFragment :
   }
 
   @ColorInt
-  private fun ColorSlidersState.getColor(): Int {
+  private fun ColorSlidersState.getLightnessColor(): Int {
     val hue = huePosition.toHue(MAX_SEEK_DIVISIONS)
+    val lightness = lightnessPosition.toUnit(MAX_SEEK_DIVISIONS)
     return ColorUtils.HSLToColor(
       floatArrayOf(
         hue,
-        saturationPosition.toUnit(MAX_SEEK_DIVISIONS),
-        calculateLightness(hue)
+        0f,
+        lightness
+      )
+    )
+  }
+
+  @ColorInt
+  private fun ColorSlidersState.getColor(): Int {
+    val hue = huePosition.toHue(MAX_SEEK_DIVISIONS)
+    val saturation = saturationPosition.toUnit(MAX_SEEK_DIVISIONS)
+    val lightness = lightnessPosition.toUnit(MAX_SEEK_DIVISIONS)
+    return ColorUtils.HSLToColor(
+      floatArrayOf(
+        hue,
+        saturation,
+        lightness
       )
     )
   }
 
   private fun ColorSlidersState.getSaturationColors(): IntArray {
     val hue = huePosition.toHue(MAX_SEEK_DIVISIONS)
-    val level = calculateLightness(hue)
+    val level = lightnessPosition.toUnit(MAX_SEEK_DIVISIONS)
 
     return listOf(0f, 1f).map {
       ColorUtils.HSLToColor(
@@ -262,6 +297,22 @@ class CustomChatColorCreatorPageFragment :
       )
     }.toIntArray()
   }
+
+  private fun ColorSlidersState.getLightnessColors(): IntArray {
+    val hue = huePosition.toHue(MAX_SEEK_DIVISIONS)
+    val saturation = saturationPosition.toUnit(MAX_SEEK_DIVISIONS)
+
+    return listOf(0f, 1f).map {
+      ColorUtils.HSLToColor(
+        floatArrayOf(
+          hue,
+          saturation,
+          it
+        )
+      )
+    }.toIntArray()
+  }
+
 
   private fun calculateLightness(hue: Float, valueFor60To80: Float = 0.3f): Float {
     val point1 = PointF()

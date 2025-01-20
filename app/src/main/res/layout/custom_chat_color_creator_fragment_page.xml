@@ -91,6 +91,30 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/saturation_label" />
 
+        <TextView
+            android:id="@+id/lightness_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:minHeight="40dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="@string/CustomChatColorCreatorFragment__lightness"
+            android:textAppearance="@style/TextAppearance.Signal.Body2.Bold"
+            android:textColor="@color/signal_text_secondary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/saturation_slider" />
+
+        <androidx.appcompat.widget.AppCompatSeekBar
+            android:id="@+id/lightness_slider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:splitTrack="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lightness_label" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/save"
             style="@style/Signal.Widget.Button.Large.Primary"

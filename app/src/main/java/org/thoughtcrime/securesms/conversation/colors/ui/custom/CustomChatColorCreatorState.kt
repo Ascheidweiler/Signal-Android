@@ -11,4 +11,4 @@ data class CustomChatColorCreatorState(
   val degrees: Float
 )
 
-data class ColorSlidersState(val huePosition: Int, val saturationPosition: Int)
+data class ColorSlidersState(val huePosition: Int, val saturationPosition: Int, val lightnessPosition : Int)
