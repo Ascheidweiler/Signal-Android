@@ -187,7 +187,7 @@ class CustomChatColorCreatorPageFragment :
 
       val color: Int = sliderState.getColor()
       hueThumb.setColor(sliderState.getHueColor())
-      saturationThumb.setColor(color)
+      saturationThumb.setColor(sliderState.getSaturationColor())
       saturationProgressDrawable.colors = sliderState.getSaturationColors()
       lightnessThumb.setColor(sliderState.getLightnessColor())
       lightnessProgressDrawable.colors = sliderState.getLightnessColors()
@@ -259,11 +259,26 @@ class CustomChatColorCreatorPageFragment :
   @ColorInt
   private fun ColorSlidersState.getLightnessColor(): Int {
     val hue = huePosition.toHue(MAX_SEEK_DIVISIONS)
+    val saturation = 1f
     val lightness = lightnessPosition.toUnit(MAX_SEEK_DIVISIONS)
     return ColorUtils.HSLToColor(
       floatArrayOf(
         hue,
-        0f,
+        saturation,
+        lightness
+      )
+    )
+  }
+
+  @ColorInt
+  private fun ColorSlidersState.getSaturationColor(): Int {
+    val hue = huePosition.toHue(MAX_SEEK_DIVISIONS)
+    val saturation = saturationPosition.toUnit(MAX_SEEK_DIVISIONS)
+    val lightness = .5f
+    return ColorUtils.HSLToColor(
+      floatArrayOf(
+        hue,
+        saturation,
         lightness
       )
     )
@@ -285,7 +300,7 @@ class CustomChatColorCreatorPageFragment :
 
   private fun ColorSlidersState.getSaturationColors(): IntArray {
     val hue = huePosition.toHue(MAX_SEEK_DIVISIONS)
-    val level = lightnessPosition.toUnit(MAX_SEEK_DIVISIONS)
+    val level = .5f
 
     return listOf(0f, 1f).map {
       ColorUtils.HSLToColor(
@@ -300,9 +315,9 @@ class CustomChatColorCreatorPageFragment :
 
   private fun ColorSlidersState.getLightnessColors(): IntArray {
     val hue = huePosition.toHue(MAX_SEEK_DIVISIONS)
-    val saturation = saturationPosition.toUnit(MAX_SEEK_DIVISIONS)
+    val saturation = 1f
 
-    return listOf(0f, 1f).map {
+    return listOf(0f, .5f, 1f).map {
       ColorUtils.HSLToColor(
         floatArrayOf(
           hue,
